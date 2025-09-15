@@ -3,6 +3,7 @@ import firebase_admin
 from firebase_admin import credentials
 import logging
 from dotenv import load_dotenv
+import streamlit as st
 
 load_dotenv()  # Load variables from .env file
 
