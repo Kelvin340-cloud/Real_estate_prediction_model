@@ -7,20 +7,20 @@ from dotenv import load_dotenv
 load_dotenv()  # Load variables from .env file
 
 def initialize_firebase():
-    try:
-        key_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    if not firebase_admin._apps:  # avoid reinitialization
+        firebase_config = st.secrets["firebase"]
 
-        if not key_path:
-            raise ValueError("Firebase credentials path not found in environment variables.")
+        cred = credentials.Certificate({
+            "type": firebase_config["type"],
+            "project_id": firebase_config["project_id"],
+            "private_key_id": firebase_config["private_key_id"],
+            "private_key": firebase_config["private_key"].replace("\\n", "\n"),
+            "client_email": firebase_config["client_email"],
+            "client_id": firebase_config["client_id"],
+            "auth_uri": firebase_config["auth_uri"],
+            "token_uri": firebase_config["token_uri"],
+            "auth_provider_x509_cert_url": firebase_config["auth_provider_x509_cert_url"],
+            "client_x509_cert_url": firebase_config["client_x509_cert_url"],
+        })
 
-        cred = credentials.Certificate(key_path)
-
-        if not firebase_admin._apps:
-            firebase_admin.initialize_app(cred)
-            logging.info("Firebase successfully initialized.")
-        else:
-            logging.info("Firebase is already initialized.")
-    
-    except Exception as e:
-        logging.error(f"Error initializing Firebase: {e}")
-        raise
+        firebase_admin.initialize_app(cred)
