@@ -1,17 +1,13 @@
-import os
 import firebase_admin
 from firebase_admin import credentials
-import logging
-from dotenv import load_dotenv
-import streamlit as st
-
-load_dotenv()  # Load variables from .env file
+import streamlit as st  # <-- you need this!
 
 def initialize_firebase():
-    if not firebase_admin._apps:  # avoid reinitialization
+    if not firebase_admin._apps:  # Avoid reinitialization
         firebase_config = st.secrets["firebase"]
 
-        cred = credentials.Certificate({
+        # Build dict for credentials
+        cred_dict = {
             "type": firebase_config["type"],
             "project_id": firebase_config["project_id"],
             "private_key_id": firebase_config["private_key_id"],
@@ -22,6 +18,9 @@ def initialize_firebase():
             "token_uri": firebase_config["token_uri"],
             "auth_provider_x509_cert_url": firebase_config["auth_provider_x509_cert_url"],
             "client_x509_cert_url": firebase_config["client_x509_cert_url"],
-        })
+        }
+
+        # Pass dict (not file path!)
+        cred = credentials.Certificate(cred_dict)
 
         firebase_admin.initialize_app(cred)
